@@ -24,10 +24,14 @@ class ImageDiscDuration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(top: 70),
+      padding: const EdgeInsets.symmetric(horizontal: 22),
       child: Row(
         children: [
           _DiscImage(),
-          //TODO Progress bar
+          const SizedBox(width: 40),
+          _ProgressBar(),
+          const SizedBox(width: 20),
         ],
       ),
     );
@@ -75,6 +79,41 @@ class _DiscImage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ProgressBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(color: Colors.white.withOpacity(0.4));
+
+    return Container(
+      child: Column(
+        children: [
+          Text('00:00', style: style),
+          const SizedBox(height: 10),
+          Stack(
+            children: [
+              Container(
+                height: 230,
+                width: 3,
+                color: Colors.white.withOpacity(0.1),
+              ),
+              Positioned(
+                bottom: 0,
+                child: Container(
+                  height: 100,
+                  width: 3,
+                  color: Colors.white.withOpacity(0.8),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text('00:00', style: style),
+        ],
       ),
     );
   }
