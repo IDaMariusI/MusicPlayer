@@ -12,6 +12,7 @@ class MusicPlayerPage extends StatelessWidget {
         children: [
           CustomAppBar(),
           ImageDiscDuration(),
+          PlayingTitle(),
         ],
       ),
     );
@@ -113,6 +114,50 @@ class _ProgressBar extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text('00:00', style: style),
+        ],
+      ),
+    );
+  }
+}
+
+class PlayingTitle extends StatelessWidget {
+  const PlayingTitle({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 50),
+      child: Row(
+        children: [
+          Column(
+            children: [
+              Text(
+                'Far away',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 30,
+                ),
+              ),
+              Text(
+                '-Breaking Benjamin-',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          FloatingActionButton(
+            backgroundColor: const Color(0xffF8CB51),
+            elevation: 0,
+            highlightElevation: 0,
+            onPressed: () {
+              //TODO Button
+            },
+            child: const Icon(Icons.play_arrow),
+          ),
         ],
       ),
     );
