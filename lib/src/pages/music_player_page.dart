@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:animate_do/animate_do.dart';
+import 'package:provider/provider.dart';
+
 import 'package:music_player/src/helpers/helpers.dart';
+import 'package:music_player/src/models/models.dart';
 import 'package:music_player/src/widgets/widgets.dart';
 
 class MusicPlayerPage extends StatelessWidget {
@@ -76,6 +80,8 @@ class ImageDiscDuration extends StatelessWidget {
 class _DiscImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final audioPlayModel = Provider.of<AudioPlayerModel>(context);
+
     return Container(
       height: 250,
       padding: const EdgeInsets.all(20),
@@ -95,7 +101,14 @@ class _DiscImage extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            const Image(image: AssetImage('assets/aurora.jpg')),
+            SpinPerfect(
+              duration: const Duration(seconds: 10),
+              infinite: true,
+              manualTrigger: true,
+              controller: (animationController) =>
+                  audioPlayModel.controller = animationController,
+              child: const Image(image: AssetImage('assets/aurora.jpg')),
+            ),
             Container(
               height: 25,
               width: 25,
@@ -212,12 +225,19 @@ class _PlayingTitleState extends State<PlayingTitle>
             elevation: 0,
             highlightElevation: 0,
             onPressed: () {
+              final audioPlayerModel = Provider.of<AudioPlayerModel>(
+                context,
+                listen: false,
+              );
+
               if (isPlaying) {
                 isPlaying = false;
                 playAnimation.reverse();
+                audioPlayerModel.controller.stop();
               } else {
                 isPlaying = true;
                 playAnimation.forward();
+                audioPlayerModel.controller.repeat();
               }
             },
             child: AnimatedIcon(
