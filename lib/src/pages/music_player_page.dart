@@ -154,8 +154,32 @@ class _ProgressBar extends StatelessWidget {
   }
 }
 
-class PlayingTitle extends StatelessWidget {
+class PlayingTitle extends StatefulWidget {
   const PlayingTitle({super.key});
+
+  @override
+  State<PlayingTitle> createState() => _PlayingTitleState();
+}
+
+class _PlayingTitleState extends State<PlayingTitle>
+    with SingleTickerProviderStateMixin {
+  bool isPlaying = false;
+  late AnimationController playAnimation;
+
+  @override
+  void initState() {
+    playAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    playAnimation.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,9 +212,18 @@ class PlayingTitle extends StatelessWidget {
             elevation: 0,
             highlightElevation: 0,
             onPressed: () {
-              //TODO Button
+              if (isPlaying) {
+                isPlaying = false;
+                playAnimation.reverse();
+              } else {
+                isPlaying = true;
+                playAnimation.forward();
+              }
             },
-            child: const Icon(Icons.play_arrow),
+            child: AnimatedIcon(
+              icon: AnimatedIcons.play_pause,
+              progress: playAnimation,
+            ),
           ),
         ],
       ),
