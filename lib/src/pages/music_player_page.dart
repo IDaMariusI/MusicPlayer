@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:provider/provider.dart';
 
 import 'package:music_player/src/helpers/helpers.dart';
@@ -137,32 +138,33 @@ class _ProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = TextStyle(color: Colors.white.withOpacity(0.4));
 
-    return Container(
-      child: Column(
-        children: [
-          Text('00:00', style: style),
-          const SizedBox(height: 10),
-          Stack(
-            children: [
-              Container(
-                height: 230,
+    final audioPlayerModel = Provider.of<AudioPlayerModel>(context);
+    final percentage = audioPlayerModel.percentage;
+
+    return Column(
+      children: [
+        Text(audioPlayerModel.songTotalDuration, style: style),
+        const SizedBox(height: 10),
+        Stack(
+          children: [
+            Container(
+              height: 230,
+              width: 3,
+              color: Colors.white.withOpacity(0.1),
+            ),
+            Positioned(
+              bottom: 0,
+              child: Container(
+                height: 230 * percentage,
                 width: 3,
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withOpacity(0.8),
               ),
-              Positioned(
-                bottom: 0,
-                child: Container(
-                  height: 100,
-                  width: 3,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text('00:00', style: style),
-        ],
-      ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Text(audioPlayerModel.currentSecond, style: style),
+      ],
     );
   }
 }
@@ -177,6 +179,8 @@ class PlayingTitle extends StatefulWidget {
 class _PlayingTitleState extends State<PlayingTitle>
     with SingleTickerProviderStateMixin {
   bool isPlaying = false;
+  bool firstTime = true;
+  final assetAudioPlayer = AssetsAudioPlayer();
   late AnimationController playAnimation;
 
   @override
@@ -192,6 +196,26 @@ class _PlayingTitleState extends State<PlayingTitle>
   void dispose() {
     playAnimation.dispose();
     super.dispose();
+  }
+
+  void open() {
+    final audioPlayerModel =
+        Provider.of<AudioPlayerModel>(context, listen: false);
+
+    assetAudioPlayer.open(
+      autoStart: true,
+      Audio('assets/Breaking-Benjamin-Far-Away.mp3'),
+      showNotification: true,
+    );
+
+    assetAudioPlayer.currentPosition.listen((duration) {
+      audioPlayerModel.current = duration;
+    });
+
+    assetAudioPlayer.current.listen((playingAudio) {
+      audioPlayerModel.songDuration =
+          playingAudio?.audio.duration ?? const Duration(seconds: 0);
+    });
   }
 
   @override
@@ -239,6 +263,13 @@ class _PlayingTitleState extends State<PlayingTitle>
                 playAnimation.forward();
                 audioPlayerModel.controller.repeat();
               }
+
+              if (firstTime) {
+                open();
+                firstTime = false;
+              } else {
+                assetAudioPlayer.playOrPause();
+              }
             },
             child: AnimatedIcon(
               icon: AnimatedIcons.play_pause,
@@ -258,21 +289,19 @@ class Lyrics extends StatelessWidget {
   Widget build(BuildContext context) {
     final lyrics = getLyrics();
 
-    return Container(
-      child: ListWheelScrollView(
-        diameterRatio: 1.5,
-        itemExtent: 42,
-        physics: const BouncingScrollPhysics(),
-        children: lyrics
-            .map((line) => Text(
-                  line,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white.withOpacity(0.6),
-                  ),
-                ))
-            .toList(),
-      ),
+    return ListWheelScrollView(
+      diameterRatio: 1.5,
+      itemExtent: 42,
+      physics: const BouncingScrollPhysics(),
+      children: lyrics
+          .map((line) => Text(
+                line,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white.withOpacity(0.6),
+                ),
+              ))
+          .toList(),
     );
   }
 }
